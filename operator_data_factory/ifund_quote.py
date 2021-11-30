@@ -6,6 +6,7 @@
 
 """
 import json
+import logging
 import sys
 
 import pandas as pd
@@ -41,12 +42,17 @@ class IFundQuote:
         self.__ifund_client.login()
         index = THS_BasicData(index_list_str, 'ths_index_short_name_index', '', True)
 
+        logging.info('index info: ' + str(index))
+
         # 处理同花顺数据，转化为df
         index_js = json.loads(index.decode('gbk'))
         index_df = pd.DataFrame(data=index_js['tables'])
         index_df[IndexBaseInfo.name] = index_df['table'].map(lambda x: x['ths_index_short_name_index'][0])
         index_df.rename(columns={'thscode': IndexBaseInfo.code}, inplace=True)
         index_df = index_df[[IndexBaseInfo.code, IndexBaseInfo.name]]
+
+        # 登出
+        self.__ifund_client.logout()
 
         self.__cache.set(index_base_info_key, index_df)
 
@@ -73,6 +79,8 @@ class IFundQuote:
         self.__ifund_client.login()
         quote = THS_RealtimeQuotes(index_list_str, 'tradeDate;latest;changeRatio', '', True)
 
+        logging.info('quote info: ' + str(quote))
+
         # 处理同花顺数据，转化为df
         quote_js = json.loads(quote.decode('gbk'))
         quote_df = pd.DataFrame(data=quote_js['tables'])
@@ -82,6 +90,9 @@ class IFundQuote:
         quote_df.dropna(inplace=True)
         quote_df.rename(columns={'thscode': BaseQuote.code}, inplace=True)
         quote_df = quote_df[[BaseQuote.trade_date, BaseQuote.code, BaseQuote.latest_price, BaseQuote.change_ratio]]
+
+        # 登出
+        self.__ifund_client.logout()
 
         if not is_trade_time:
             self.__cache.set(quote_base_info_key, quote_df)
