@@ -22,6 +22,19 @@ SZ_CODE = '399001'
 BS_CODE = '399006'
 
 HK_TO_SH_CODE = 'HK_TO_SH'
-HK_TO_SH_NAME = '沪港通'
+HK_TO_SH_NAME = '沪股通'
 HK_TO_SZ_CODE = 'HK_TO_SZ'
-HK_TO_SZ_NAME = '深港通'
+HK_TO_SZ_NAME = '深股通'
+
+IFUND_HK_TO_SZ_CODE = '深股通'
+IFUND_HK_TO_SH_CODE = '沪股通'
+
+# 上证指数
+IFUND_SH_CODE = '000001.SH'
+SH_NAME = '上证指数'
+# 深证成指
+IFUND_SZ_CODE = '399001.SZ'
+SZ_NAME = '深证成指'
+# 创业板指
+IFUND_BS_CODE = '399006.SZ'
+BS_NAME = '创业板指'

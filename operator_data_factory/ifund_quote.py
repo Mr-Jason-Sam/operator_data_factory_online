@@ -5,14 +5,13 @@
 @Time        : 2021/4/9 14:24
 
 """
-import json
 import logging
-import sys
 
 import pandas as pd
 from iFinDPy import *
 
 import business_tools
+import datetime
 from base_quote import BaseQuote
 from cache import BusinessCache
 from ifund_client import IFundClient
@@ -140,3 +139,93 @@ class IFundQuote:
         self.__cache.set(industry_info_key, assemble_df)
 
         return assemble_df
+    
+    """
+    :@deprecated: 获取A股指数数据
+    :@param: 
+    :@return: 
+    """
+    def fetch_a_index_info(self, v_index_code_list: []):
+
+        index_list_str = ','.join(v_index_code_list)
+
+        # 获取同花顺数据
+        self.__ifund_client.login()
+        # THS_RQ('000001.SH,399001.SZ,399006.SZ', 'latest;changeRatio;amount')
+        quote = THS_RQ(index_list_str, 'latest;changeRatio;amount')
+
+        # 处理同花顺数据，转化为df
+
+        quote_df = quote.data
+        # 登出
+        self.__ifund_client.logout()
+
+        if quote_df is None or quote_df.empty:
+            raise Exception(index_list_str + '数据为空！')
+
+        quote_df.rename(
+            columns={
+                'time': BaseQuote.trade_date,
+                'thscode': BaseQuote.code,
+                'latest': BaseQuote.latest_price,
+                'changeRatio': BaseQuote.change_ratio,
+                'amount': BaseQuote.amount
+            },
+            inplace=True)
+
+        # 转换为交易日
+        quote_df[BaseQuote.trade_date] = quote_df[BaseQuote.trade_date].map(
+            lambda x: datetime.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').strftime('%Y%m%d')
+        )
+
+        return quote_df
+    
+    """
+    :@deprecated: 获取沪港数据
+    :@param: 
+    :@return: 
+    """
+    def fetch_a_to_hk_info(self, v_name: str):
+        # 获取同花顺数据
+        self.__ifund_client.login()
+        # THS_RQ('000001.SH,399001.SZ,399006.SZ', 'latest;changeRatio;volume')
+        quote = THS_DP('balanceOfSHSZHK', '最新;最新;' + v_name, 'tradeDate:Y,updateTime:Y,buyAmount:Y,sellAmount:Y')
+
+        # 处理同花顺数据，转化为df
+
+        quote_df = quote.data
+        # 登出
+        self.__ifund_client.logout()
+
+        if quote_df is None or quote_df.empty:
+            raise Exception(v_name + '数据为空！')
+
+        latest_df = quote_df[quote_df['updateTime'] == '15:00'].copy()
+
+        if latest_df is None or latest_df.empty:
+            raise Exception('当天未生成最新的' + v_name + '数据！')
+
+        latest_df.rename(
+            columns={
+                'tradeDate': BaseQuote.trade_date,
+                'buyAmount': BaseQuote.buy_amount,
+                'sellAmount': BaseQuote.sell_amount
+            },
+            inplace=True)
+
+        # 转换为交易日
+        latest_df[BaseQuote.trade_date] = latest_df[BaseQuote.trade_date].map(lambda x: x.replace('/', ''))
+
+        return latest_df
+
+
+# index_code_list = ['000001.SH', '399001.SZ', '399006.SZ']
+#
+# test_quote = IFundQuote()
+# # data_df = test_quote.fetch_a_index_info(index_code_list)
+#
+# HK_TO_SZ = '深股通'
+# HK_TO_SH = '沪股通'
+#
+# HK_TO_SZ_df = test_quote.fetch_a_to_hk_info(HK_TO_SZ)
+# HK_TO_SH_df = test_quote.fetch_a_to_hk_info(HK_TO_SH)

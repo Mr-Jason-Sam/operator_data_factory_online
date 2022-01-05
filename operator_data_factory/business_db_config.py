@@ -8,9 +8,9 @@ import cx_Oracle
 
 
 class BusinessDbConfig:
-    user = 'fund_analysis'
-    password = 'fund_analysis'
-    link = '10.190.0.65:1528/cjhx'
+    user = 'wj_oms'
+    password = 'wj_oms'
+    link = '10.190.0.60:1528/cjhx'
 
     pools = cx_Oracle.SessionPool(user, password, link, min=3, max=10, increment=1, threaded=True, encoding="UTF-8")
 

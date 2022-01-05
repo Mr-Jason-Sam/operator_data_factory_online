@@ -9,6 +9,7 @@ import sys
 
 import business_config
 import business_tools
+import date_constants
 from base_quote import BaseQuote
 from cache import BusinessCache
 from close_mkt_info import CloseMktInfo
@@ -21,6 +22,7 @@ class QuoteController:
 
     def __init__(self):
         self.__daily_review_service = DailyReviewService()
+        self.__cache = BusinessCache().get_cache()
 
     """
     :@deprecated: 获取指数数据
@@ -34,14 +36,14 @@ class QuoteController:
 
         # 非交易时间可使用缓存数据
         if not is_trade_time:
-            quote_data = BusinessCache().get_cache().get(key)
+            quote_data = self.__cache.get(key)
             if quote_data is not None:
                 return quote_data
 
-        quote_data = self.__daily_review_service.fetch_base_index_quote()
+        quote_data = self.__daily_review_service.fetch_latest_index_quote_from_ifund()
 
         if not is_trade_time:
-            BusinessCache().get_cache().set(key, quote_data)
+            self.__cache.set(key, quote_data, ttl=date_constants.ONE_DATE_SECONDS)
 
         return quote_data
 
@@ -57,7 +59,7 @@ class QuoteController:
 
         # 非交易时间可使用缓存数据
         if not is_trade_time:
-            quote_demo = BusinessCache().get_cache().get(key)
+            quote_demo = self.__cache.get(key)
             if quote_demo is not None:
                 return quote_demo
 
@@ -74,7 +76,7 @@ class QuoteController:
         }
 
         if not is_trade_time:
-            BusinessCache().get_cache().set(key, industry_data)
+            self.__cache.set(key, industry_data)
 
         return industry_data
 

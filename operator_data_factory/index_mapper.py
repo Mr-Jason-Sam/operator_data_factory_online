@@ -44,6 +44,7 @@ class IndexMapper:
                     SELECT """ + handle_sql_data(data, BaseQuote.code) + """ INDEX_CODE, """ + handle_sql_data(data, BaseQuote.trade_date) + """ TRADE_DT,
                     """ + handle_sql_data(data, BaseQuote.latest_price) + """ INDEX_PRICE, """ + handle_sql_data(data, BaseQuote.change_ratio) + """ INDEX_CHANGE,
                     """ + handle_sql_data(data, BaseQuote.name) + """ INDEX_NAME,
+                    """ + handle_sql_data(data, BaseQuote.amount) + """ INDEX_AMOUNT,
                     """ + handle_sql_data(data, BaseQuote.buy_amount) + """ INDEX_BUY_AMOUNT, """ + handle_sql_data(data, BaseQuote.sell_amount) + """ INDEX_SELL_AMOUNT
                     FROM DUAL
                 ) QUOTE_DATA
@@ -55,13 +56,16 @@ class IndexMapper:
                     SET QUOTE_INFO.PRICE       = QUOTE_DATA.INDEX_PRICE,
                         QUOTE_INFO.CHANGE      = QUOTE_DATA.INDEX_CHANGE,
                         QUOTE_INFO.NAME        = QUOTE_DATA.INDEX_NAME,
+                        QUOTE_INFO.TURNOVER_AMOUNT = QUOTE_DATA.INDEX_AMOUNT,
                         QUOTE_INFO.BUY_AMOUNT  = QUOTE_DATA.INDEX_BUY_AMOUNT,
                         QUOTE_INFO.SELL_AMOUNT = QUOTE_DATA.INDEX_SELL_AMOUNT,
                         QUOTE_INFO.UPDATE_TIME = SYSDATE
                 WHEN NOT MATCHED THEN
                     INSERT (QUOTE_INFO.CODE, QUOTE_INFO.TRADE_DATE, QUOTE_INFO.PRICE, QUOTE_INFO.CHANGE, QUOTE_INFO.NAME,
+                            QUOTE_INFO.TURNOVER_AMOUNT,
                             QUOTE_INFO.BUY_AMOUNT, QUOTE_INFO.SELL_AMOUNT)
                     VALUES (QUOTE_DATA.INDEX_CODE, QUOTE_DATA.TRADE_DT, QUOTE_DATA.INDEX_PRICE, QUOTE_DATA.INDEX_CHANGE, QUOTE_DATA.INDEX_NAME,
+                            QUOTE_DATA.INDEX_AMOUNT,
                             QUOTE_DATA.INDEX_BUY_AMOUNT, QUOTE_DATA.INDEX_SELL_AMOUNT)
             """
             self.__cursor.execute(merge_into_sql)
