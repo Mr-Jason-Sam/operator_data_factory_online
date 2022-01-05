@@ -25,6 +25,9 @@ class IndexMapper:
         self.__cursor = self.__business_cfg.get_cursor()
         self.__connection = self.__business_cfg.get_connection()
 
+    def __del__(self):
+        self.__cursor.close()
+
     """
     :@deprecated: 存储指数数据
     :@param: 
