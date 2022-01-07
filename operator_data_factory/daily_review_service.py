@@ -128,7 +128,7 @@ class DailyReviewService:
     :@return:
     """
 
-    def fetch_latest_index_quote_from_ifund(self, date_time: str = None):
+    def fetch_latest_index_quote_from_ifund(self):
         key = sys._getframe().f_code.co_name
         is_trade_time = business_tools.is_trade()
 
@@ -137,10 +137,6 @@ class DailyReviewService:
             index_quote_list = self.__cache.get(key)
             if index_quote_list is not None:
                 return index_quote_list
-
-        if date_time is None:
-            # 获取当前毫秒级时间戳
-            date_time = str(time_tools.get_now_timestamp(time_tools.TimeUnit.millisecond))
 
         # 沪港通数据
         hk_to_sh_df = self.__ifund_quote_service.fetch_a_to_hk_info(v_name=business_config.IFUND_HK_TO_SH_CODE)
@@ -232,6 +228,6 @@ class DailyReviewService:
             )
 
         if not is_trade_time:
-            self.__cache.set(key, index_quote_list, ttl=date_constants.ONE_DATE_SECONDS)
+            self.__cache.set(key, index_quote_list, ttl=date_constants.ONE_HOUR_SECONDS)
 
         return index_quote_list
