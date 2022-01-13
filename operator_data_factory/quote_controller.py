@@ -43,7 +43,7 @@ class QuoteController:
         quote_data = self.__daily_review_service.fetch_latest_index_quote_from_ifund()
 
         if not is_trade_time:
-            self.__cache.set(key, quote_data, ttl=date_constants.ONE_DATE_SECONDS)
+            self.__cache.set(key, quote_data, ttl=date_constants.HALF_HOUR_SECONDS)
 
         return quote_data
 

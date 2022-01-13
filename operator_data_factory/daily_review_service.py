@@ -118,7 +118,7 @@ class DailyReviewService:
         )
 
         if not is_trade_time:
-            self.__cache.set(key, index_quote_list, ttl=date_constants.ONE_DATE_SECONDS)
+            self.__cache.set(key, index_quote_list, ttl=date_constants.HALF_HOUR_SECONDS)
 
         return index_quote_list
 
@@ -228,6 +228,6 @@ class DailyReviewService:
             )
 
         if not is_trade_time:
-            self.__cache.set(key, index_quote_list, ttl=date_constants.ONE_HOUR_SECONDS)
+            self.__cache.set(key, index_quote_list, ttl=date_constants.HALF_HOUR_SECONDS)
 
         return index_quote_list

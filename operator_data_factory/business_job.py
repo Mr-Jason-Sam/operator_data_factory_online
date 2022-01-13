@@ -46,7 +46,7 @@ if __name__ == '__main__':
     # 收盘任务
     scheduler.add_job(
          close_market_job,
-         trigger=CronTrigger(hour=15, minute='0/5', day_of_week='mon-fri')
+         trigger=CronTrigger(hour=15, minute='5/5', day_of_week='mon-fri')
     )
     
     logging.info('close_market_job start！')
