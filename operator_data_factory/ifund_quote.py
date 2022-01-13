@@ -13,6 +13,7 @@ from iFinDPy import *
 
 import business_config
 import business_tools
+import date_constants
 from base_quote import BaseQuote
 from cache import BusinessCache
 from ifund_client import IFundClient
@@ -97,7 +98,7 @@ class IFundQuote:
         quote_df[BaseQuote.trade_date] = quote_df[BaseQuote.trade_date].map(lambda x: str(x).replace('-', ''))
 
         if not is_trade_time:
-            self.__cache.set(quote_base_info_key, quote_df)
+            self.__cache.set(quote_base_info_key, quote_df, ttl=date_constants.ONE_HOUR_SECONDS)
 
         return quote_df
 
@@ -141,8 +142,8 @@ class IFundQuote:
                                on=[IndexBaseInfo.code]).dropna()
 
         assemble_df = assemble_df.sort_values(by=BaseQuote.change_ratio, ascending=False)
-
-        self.__cache.set(industry_info_key, assemble_df)
+        if not is_trade_time:
+            self.__cache.set(industry_info_key, assemble_df, ttl=date_constants.ONE_HOUR_SECONDS)
 
         return assemble_df
 
