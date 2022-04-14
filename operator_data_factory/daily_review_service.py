@@ -15,9 +15,11 @@ import hkex
 import shex
 import szex
 import time_tools
+import pandas as pd
 from base_quote import BaseQuote
 from cache import BusinessCache
 from ifund_quote import IFundQuote
+
 
 
 class DailyReviewService:
@@ -139,14 +141,23 @@ class DailyReviewService:
                 return index_quote_list
 
         # 沪港通数据
-        hk_to_sh_df = self.__ifund_quote_service.fetch_a_to_hk_info(v_name=business_config.IFUND_HK_TO_SH_CODE)
+        try:
+            hk_to_sh_df = self.__ifund_quote_service.fetch_a_to_hk_info(v_name=business_config.IFUND_HK_TO_SH_CODE)
+        except Exception:
+            hk_to_sh_df = pd.DataFrame()
 
         # 深港通数据
-        hk_to_sz_df = self.__ifund_quote_service.fetch_a_to_hk_info(v_name=business_config.IFUND_HK_TO_SZ_CODE)
+        try:
+            hk_to_sz_df = self.__ifund_quote_service.fetch_a_to_hk_info(v_name=business_config.IFUND_HK_TO_SZ_CODE)
+        except Exception:
+            hk_to_sz_df = pd.DataFrame()
 
         index_code_list = [business_config.IFUND_SH_CODE, business_config.IFUND_SZ_CODE, business_config.IFUND_BS_CODE]
 
-        index_df = self.__ifund_quote_service.fetch_a_index_info(index_code_list)
+        try:
+            index_df = self.__ifund_quote_service.fetch_a_index_info(index_code_list)
+        except Exception:
+            index_df = pd.DataFrame()
 
         # 上证综指数据
         sh_index_df = index_df[index_df[BaseQuote.code] == business_config.IFUND_SH_CODE].copy()
