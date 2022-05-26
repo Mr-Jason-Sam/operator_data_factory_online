@@ -202,7 +202,7 @@ class IFundQuote:
 
         # 处理同花顺数据，转化为df
 
-        quote_df = quote.data
+        quote_df = pd.DataFrame(data=quote.data)
         # 登出
         self.__ifund_client.logout()
 

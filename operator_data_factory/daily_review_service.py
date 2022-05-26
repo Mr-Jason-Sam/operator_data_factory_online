@@ -140,16 +140,19 @@ class DailyReviewService:
             if index_quote_list is not None:
                 return index_quote_list
 
+        has_total_data = True
         # 沪港通数据
         try:
             hk_to_sh_df = self.__ifund_quote_service.fetch_a_to_hk_info(v_name=business_config.IFUND_HK_TO_SH_CODE)
         except Exception:
+            has_total_data = False
             hk_to_sh_df = pd.DataFrame()
 
         # 深港通数据
         try:
             hk_to_sz_df = self.__ifund_quote_service.fetch_a_to_hk_info(v_name=business_config.IFUND_HK_TO_SZ_CODE)
         except Exception:
+            has_total_data = False
             hk_to_sz_df = pd.DataFrame()
 
         index_code_list = [business_config.IFUND_SH_CODE, business_config.IFUND_SZ_CODE, business_config.IFUND_BS_CODE]
@@ -157,6 +160,7 @@ class DailyReviewService:
         try:
             index_df = self.__ifund_quote_service.fetch_a_index_info(index_code_list)
         except Exception:
+            has_total_data = False
             index_df = pd.DataFrame()
 
         # 上证综指数据
@@ -238,7 +242,7 @@ class DailyReviewService:
                 }
             )
 
-        if not is_trade_time:
+        if not is_trade_time and has_total_data:
             self.__cache.set(key, index_quote_list, ttl=date_constants.HALF_HOUR_SECONDS)
 
         return index_quote_list

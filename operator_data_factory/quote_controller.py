@@ -31,19 +31,19 @@ class QuoteController:
     """
 
     def get_index_base_quote(self):
-        key = sys._getframe().f_code.co_name
-        is_trade_time = business_tools.is_trade()
+        # key = sys._getframe().f_code.co_name
+        # is_trade_time = business_tools.is_trade()
 
-        # 非交易时间可使用缓存数据
-        if not is_trade_time:
-            quote_data = self.__cache.get(key)
-            if quote_data is not None:
-                return quote_data
+        # # 非交易时间可使用缓存数据
+        # if not is_trade_time:
+        #     quote_data = self.__cache.get(key)
+        #     if quote_data is not None:
+        #         return quote_data
 
         quote_data = self.__daily_review_service.fetch_latest_index_quote_from_ifund()
 
-        if not is_trade_time:
-            self.__cache.set(key, quote_data, ttl=date_constants.HALF_HOUR_SECONDS)
+        # if not is_trade_time:
+        #     self.__cache.set(key, quote_data, ttl=date_constants.HALF_HOUR_SECONDS)
 
         return quote_data
 
